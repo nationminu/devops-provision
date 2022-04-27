@@ -1,1 +1,1 @@
-test ansible_host=172.31.37.132 ip=3.34.98.110
+test ansible_host=xxxxxxxx ip=xxxxxxxx

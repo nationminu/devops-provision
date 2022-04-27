@@ -1,0 +1,10 @@
+---
+# file: webservers.yml
+- hosts: all
+  become: true
+
+  tasks:
+    - ping:
+
+  roles:
+    - docker

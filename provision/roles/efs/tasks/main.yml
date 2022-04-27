@@ -1,0 +1,30 @@
+---
+# tasks file for efs
+# https://docs.aws.amazon.com/efs/latest/ug/mounting-fs.html
+# https://docs.aws.amazon.com/efs/latest/ug/installing-amazon-efs-utils.html
+
+- name: Run the equivalent of "apt-get update" as a separate step
+  apt:
+    update_cache: yes
+
+- name: Install a list of packages
+  apt:
+    pkg:
+    - binutils
+
+- name: Git checkout
+  ansible.builtin.git:
+    repo: 'https://github.com/aws/efs-utils.git'
+    dest: /root/efs-utils
+    version: master
+
+- name: Build amazon-efs-utils using the following command
+  command: /root/efs-utils/build-deb.sh
+
+- name: Install amazon-efs-utils .deb package from the file
+  apt:
+    deb: /root/efs-utils/build/amazon-efs-utils*deb
+
+- name: Automatically mount EFS using /etc/fstab with EFS mount helper
+  command: echo "fs-0b7d7984cb0b6deb7:/ /data/efs efs _netdev,noresvport,tls 0 0" >> /etc/fstab
+  #command: echo "fs-0b7d7984cb0b6deb7.efs.ap-northeast-2.amazonaws.com:/ /data/efs nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport 0 0" >> /etc/fstab

@@ -1,0 +1,62 @@
+---
+# tasks file for docker
+# https://docs.docker.com/engine/install/ubuntu/
+- name: Run the equivalent of "apt-get update" as a separate step
+  apt:
+    update_cache: yes
+
+- name: Remove a list of packages
+  apt: 
+    state: absent
+    pkg:
+    - docker
+    - docker.io
+    - docker-engine
+    - containerd
+    - runc
+
+- name: Install a list of packages
+  apt:
+    pkg:
+    - ca-certificates
+    - curl
+    - gnupg
+    - lsb-release
+    - python3-pip
+
+- name: Add an Apt signing key to a specific keyring file
+  ansible.builtin.apt_key: 
+    url: https://download.docker.com/linux/ubuntu/gpg 
+    keyring: /usr/share/keyrings/docker-archive-keyring.gpg
+
+- name: Add specified repository into sources list using specified filename
+  ansible.builtin.apt_repository:
+    repo: deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu focal stable
+    state: present
+    filename: docker-ce
+
+- name: Run the equivalent of "apt-get update" as a separate step
+  apt:
+    update_cache: yes
+
+- name: Install a list of docker packages
+  apt:
+    pkg:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-compose-plugin
+
+- name: Remove useless packages from the cache
+  apt:
+    autoclean: yes
+
+- name: Remove dependencies that are no longer required
+  apt:
+    autoremove: yes
+
+- name: Enable a timer unit for docker-ce
+  ansible.builtin.systemd:
+    name: docker
+    state: started
+    enabled: yes
